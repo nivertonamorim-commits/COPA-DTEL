@@ -37,12 +37,14 @@ export default function LoadingScreen({ appData, onComplete, onError }: Props) {
 
         const ai = new GoogleGenAI({ apiKey });
         
-        const base64Data = appData.userImage.split(',')[1];
-        const mimeType = appData.userImage.split(';')[0].split(':')[1];
+        // Extração correta do base64 para o Vite
+        const base64Parts = appData.userImage.split(',');
+        const base64Data = base64Parts[1];
+        const mimeType = base64Parts[0].split(';')[0].split(':')[1];
 
-        const prompt = `Create an ultra-photorealistic, cinematic 8K image of a football fan transformed into a Brazilian national team champion player, celebrating victory in a packed stadium. Wearing official-style Brazil jersey, holding golden world championship trophy. Preserve exact facial identity. Cinematic stadium lighting.`;
+        const prompt = `Create an ultra-photorealistic image of a football fan wearing a Brazil national team jersey, holding a golden world championship trophy in a packed stadium. Preserve facial identity from the photo. Cinematic lighting, 8k resolution.`;
 
-        // CORREÇÃO: Apenas UMA declaração de 'result' para evitar o erro de build
+        // Chamada única para evitar o erro de declaração duplicada
         const result = await ai.models.generateContent({
           model: 'gemini-3.1-flash-image-preview', 
           contents: {
@@ -60,8 +62,8 @@ export default function LoadingScreen({ appData, onComplete, onError }: Props) {
         });
 
         let generatedUrl = null;
-        // Pega a imagem da resposta com tratamento de erro
         const parts = result.candidates?.[0]?.content?.parts || [];
+        
         for (const part of parts) {
           if (part.inlineData) {
             generatedUrl = `data:image/png;base64,${part.inlineData.data}`;
