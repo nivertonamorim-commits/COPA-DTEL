@@ -32,20 +32,19 @@ export default function LoadingScreen({ appData, onComplete, onError }: Props) {
       try {
         if (!appData.userImage) throw new Error('No image provided');
 
-        // Puxa a chave da Vercel (Certifique-se que o nome na Vercel é VITE_GEMINI_KEY)
         const apiKey = import.meta.env.VITE_GEMINI_KEY;
         if (!apiKey) throw new Error('API Key missing');
 
         const ai = new GoogleGenAI({ apiKey });
         
-        // Separa os dados da imagem
+        // Separação correta do base64 para o modelo Gemini
         const base64Parts = appData.userImage.split(',');
         const base64Data = base64Parts[1];
         const mimeType = base64Parts[0].split(';')[0].split(':')[1];
 
-        const prompt = `Create an ultra-photorealistic, cinematic 8K image of a football fan transformed into a Brazilian national team champion player, celebrating victory in a packed stadium. Wearing official-style Brazil jersey, holding golden world championship trophy. Preserve exact facial identity. Cinematic stadium lighting.`;
+        const prompt = `Create an ultra-photorealistic, cinematic 8K image of a football fan transformed into a Brazilian national team champion player, celebrating victory in a packed stadium. Wearing official-style Brazil jersey, holding golden world championship trophy. Preserve exact facial identity from the photo. Cinematic stadium lighting.`;
 
-        // ALTERAÇÃO: Mudança para o modelo Gemini 2.5 Flash Image (Nano Banana)
+        // MODELO COM COTA GRATUITA (Até 500 imagens/dia)
         const result = await ai.models.generateContent({
           model: 'gemini-2.5-flash-image', 
           contents: {
@@ -62,7 +61,6 @@ export default function LoadingScreen({ appData, onComplete, onError }: Props) {
         });
 
         let generatedUrl = null;
-        // Pega a imagem da resposta
         const parts = result.candidates?.[0]?.content?.parts || [];
         for (const part of parts) {
           if (part.inlineData) {
