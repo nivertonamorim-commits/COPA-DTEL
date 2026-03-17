@@ -28,16 +28,55 @@ export default function LoadingScreen({ appData, onComplete, onError }: Props) {
   }, []);
 
   useEffect(() => {
+    // ... (mantenha os imports iguais)
+
     const generateImage = async () => {
       try {
         if (!appData.userImage) throw new Error('No image provided');
 
-        const apiKey = process.env.API_KEY || process.env.GEMINI_API_KEY;
+        // CORREÇÃO 1: Usar VITE_ para funcionar na Vercel
+        const apiKey = import.meta.env.VITE_GEMINI_KEY;
+        
+        if (!apiKey) {
+          console.error("ERRO: Chave de API não encontrada. Verifique as variáveis na Vercel.");
+          throw new Error('API Key missing');
+        }
+
         const ai = new GoogleGenAI({ apiKey });
         
-        // Extract base64 data
         const base64Data = appData.userImage.split(',')[1];
         const mimeType = appData.userImage.split(';')[0].split(':')[1];
+
+        // O prompt gigante que você já tem...
+        const prompt = `Create an ultra-photorealistic...`; 
+
+        const response = await ai.models.generateContent({
+          // CORREÇÃO 2: Use o modelo estável 'gemini-2.0-flash' ou 'imagen-3.0-generate-001'
+          // O 'gemini-3.1-flash-image-preview' pode não estar disponível na sua região ou conta gratuita
+          model: 'gemini-2.0-flash', 
+          contents: {
+            parts: [
+              {
+                inlineData: {
+                  data: base64Data,
+                  mimeType: mimeType,
+                },
+              },
+              {
+                text: prompt,
+              },
+            ],
+          },
+          config: {
+            imageConfig: {
+              aspectRatio: "9:16",
+              // CORREÇÃO 3: Remova "imageSize: 1K" se der erro, pois alguns modelos gratuitos limitam a resolução
+            }
+          }
+        });
+
+// ... (resto do código igual)
+
 
         const prompt = `Create an ultra-photorealistic, cinematic 8K image of a football fan transformed into a Brazilian national team champion player, celebrating victory in a packed stadium.
 
