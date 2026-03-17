@@ -43,7 +43,7 @@ export default function LoadingScreen({ appData, onComplete, onError }: Props) {
 
         const prompt = `Create an ultra-photorealistic, cinematic 8K image of a football fan wearing a Brazil national team jersey, holding a golden world championship trophy in a packed stadium. Preserve facial identity from the photo. Cinematic lighting.`;
 
-        // CORREÇÃO: Usando apenas UMA declaração de 'response' e modelo estável
+        // CORREÇÃO: Usando apenas UMA declaração de 'result' e modelo estável 2.0
         const result = await ai.models.generateContent({
           model: 'gemini-2.0-flash', 
           contents: {
@@ -56,7 +56,7 @@ export default function LoadingScreen({ appData, onComplete, onError }: Props) {
         });
 
         let generatedUrl = null;
-        // Pega a imagem da resposta
+        // Pega a imagem da resposta com segurança
         const parts = result.candidates?.[0]?.content?.parts || [];
         for (const part of parts) {
           if (part.inlineData) {
@@ -94,7 +94,7 @@ export default function LoadingScreen({ appData, onComplete, onError }: Props) {
       <h2 className="text-3xl font-black uppercase tracking-tight mb-4">
         Gerando <span className="text-[#00ff88]">Magia</span>
       </h2>
-      <p className="text-gray-400 text-lg font-medium">{MESSAGES[msgIndex]}</p>
+      <p className="text-gray-400 text-lg font-medium h-8">{MESSAGES[msgIndex]}</p>
     </div>
   );
 }
