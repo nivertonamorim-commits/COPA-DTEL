@@ -1,0 +1,5 @@
+{
+  "name": "Dtel World Cup AI Experience",
+  "description": "A viral marketing web app for Dtel Telecom that generates AI photos of users with football stars.",
+  "requestFramePermissions": ["camera"]
+}
