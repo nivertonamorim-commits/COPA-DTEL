@@ -32,19 +32,20 @@ export default function LoadingScreen({ appData, onComplete, onError }: Props) {
       try {
         if (!appData.userImage) throw new Error('No image provided');
 
+        // Puxa a chave da Vercel
         const apiKey = import.meta.env.VITE_GEMINI_KEY;
         if (!apiKey) throw new Error('API Key missing');
 
         const ai = new GoogleGenAI({ apiKey });
         
-        // Extração correta do base64 para o Vite
+        // Separa os dados da imagem corretamente
         const base64Parts = appData.userImage.split(',');
         const base64Data = base64Parts[1];
         const mimeType = base64Parts[0].split(';')[0].split(':')[1];
 
-        const prompt = `Create an ultra-photorealistic image of a football fan wearing a Brazil national team jersey, holding a golden world championship trophy in a packed stadium. Preserve facial identity from the photo. Cinematic lighting, 8k resolution.`;
+        const prompt = `Create an ultra-photorealistic, cinematic 8K image of a football fan wearing a Brazil national team jersey, holding a golden world championship trophy in a packed stadium. Preserve exact facial identity. Cinematic stadium lighting.`;
 
-        // Chamada única para evitar o erro de declaração duplicada
+        // CHAMADA ÚNICA (Aqui estava o erro: você tinha duas dessas)
         const result = await ai.models.generateContent({
           model: 'gemini-3.1-flash-image-preview', 
           contents: {
@@ -62,8 +63,8 @@ export default function LoadingScreen({ appData, onComplete, onError }: Props) {
         });
 
         let generatedUrl = null;
+        // Pega a imagem da resposta
         const parts = result.candidates?.[0]?.content?.parts || [];
-        
         for (const part of parts) {
           if (part.inlineData) {
             generatedUrl = `data:image/png;base64,${part.inlineData.data}`;
@@ -100,7 +101,7 @@ export default function LoadingScreen({ appData, onComplete, onError }: Props) {
       <h2 className="text-3xl font-black uppercase tracking-tight mb-4">
         Gerando <span className="text-[#00ff88]">Magia</span>
       </h2>
-      <p className="text-gray-400 text-lg font-medium h-8">{MESSAGES[msgIndex]}</p>
+      <p className="text-gray-400 text-lg font-medium">{MESSAGES[msgIndex]}</p>
     </div>
   );
 }
