@@ -17,7 +17,6 @@ const MESSAGES = [
   'Quase lá...',
 ];
 
-// O "export default" é obrigatório aqui para o App.tsx funcionar
 export default function LoadingScreen({ appData, onComplete, onError }: Props) {
   const [msgIndex, setMsgIndex] = useState(0);
 
@@ -33,18 +32,20 @@ export default function LoadingScreen({ appData, onComplete, onError }: Props) {
       try {
         if (!appData.userImage) throw new Error('No image provided');
 
+        // Puxa a chave da Vercel (Certifique-se que o nome lá é VITE_GEMINI_KEY)
         const apiKey = import.meta.env.VITE_GEMINI_KEY;
         if (!apiKey) throw new Error('API Key missing');
 
+        // Inicializa a biblioteca correta
         const genAI = new GoogleGenerativeAI(apiKey);
         
-        // Separação correta do base64 para a API do Google
+        // Separação correta do base64 para a API
         const base64Data = appData.userImage.split(',')[1];
         const mimeType = appData.userImage.split(';')[0].split(':')[1];
 
-        const prompt = `Crie uma imagem ultra-realista de um torcedor no estádio com a camisa da seleção brasileira segurando a taça da copa. Preserve o rosto da foto enviada.`;
+        const prompt = "Crie uma imagem ultra-realista de um torcedor no estádio com a camisa da seleção brasileira segurando a taça da copa. Preserve o rosto da foto enviada.";
 
-        // Mudança para o modelo 1.5-flash (Nano Banana Fast)
+        // Modelo 1.5-flash (Nano Fast)
         const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
         const result = await model.generateContent([
@@ -63,7 +64,7 @@ export default function LoadingScreen({ appData, onComplete, onError }: Props) {
         if (generatedImageBase64) {
           onComplete(`data:image/png;base64,${generatedImageBase64}`);
         } else {
-          throw new Error('IA não gerou imagem');
+          throw new Error('IA não retornou os dados da imagem');
         }
       } catch (error) {
         console.error('Generation error:', error);
